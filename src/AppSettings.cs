@@ -13,7 +13,9 @@ namespace SleepyFox
     internal sealed class AppSettings
     {
         private int nightStartHour;
+        private int nightStartMinute;
         private int nightEndHour;
+        private int nightEndMinute;
         private int idleMinutes;
         private int actionDelayMinutes;
         private int checkIntervalMinutes;
@@ -25,7 +27,9 @@ namespace SleepyFox
         public AppSettings()
         {
             nightStartHour = 23;
+            nightStartMinute = 0;
             nightEndHour = 7;
+            nightEndMinute = 0;
             idleMinutes = 60;
             actionDelayMinutes = 15;
             checkIntervalMinutes = 5;
@@ -47,6 +51,20 @@ namespace SleepyFox
         {
             get { return nightEndHour; }
             set { nightEndHour = value; }
+        }
+
+        /// <summary>Минута, с которой начинается ночь (0–59).</summary>
+        public int NightStartMinute
+        {
+            get { return nightStartMinute; }
+            set { nightStartMinute = value; }
+        }
+
+        /// <summary>Минута, в которой ночь заканчивается (0–59).</summary>
+        public int NightEndMinute
+        {
+            get { return nightEndMinute; }
+            set { nightEndMinute = value; }
         }
 
         /// <summary>Минут без ввода мыши и клавиатуры, после которых считаем, что человек уснул.</summary>
@@ -102,7 +120,9 @@ namespace SleepyFox
         {
             AppSettings copy = new AppSettings();
             copy.nightStartHour = nightStartHour;
+            copy.nightStartMinute = nightStartMinute;
             copy.nightEndHour = nightEndHour;
+            copy.nightEndMinute = nightEndMinute;
             copy.idleMinutes = idleMinutes;
             copy.actionDelayMinutes = actionDelayMinutes;
             copy.checkIntervalMinutes = checkIntervalMinutes;
@@ -117,31 +137,36 @@ namespace SleepyFox
         public void Normalize()
         {
             nightStartHour = Clamp(nightStartHour, 0, 23);
+            nightStartMinute = Clamp(nightStartMinute, 0, 59);
             nightEndHour = Clamp(nightEndHour, 0, 23);
+            nightEndMinute = Clamp(nightEndMinute, 0, 59);
             idleMinutes = Clamp(idleMinutes, 1, 1440);
             actionDelayMinutes = Clamp(actionDelayMinutes, 1, 1440);
             checkIntervalMinutes = Clamp(checkIntervalMinutes, 1, 120);
         }
 
         /// <summary>
-        /// Ночь ли сейчас. Окно может переходить через полночь: с 23 до 7.
-        /// Если «с» и «до» совпадают, ночи нет вообще — так безопаснее.
+        /// Ночь ли сейчас. Окно задаётся часами и минутами и может переходить
+        /// через полночь: с 23:00 до 07:00. Если «с» и «до» совпадают, ночи нет
+        /// вообще — так безопаснее.
         /// </summary>
         public bool IsNight(DateTime moment)
         {
-            int hour = moment.Hour;
+            int nowMinutes = moment.Hour * 60 + moment.Minute;
+            int fromMinutes = nightStartHour * 60 + nightStartMinute;
+            int toMinutes = nightEndHour * 60 + nightEndMinute;
 
-            if (nightStartHour == nightEndHour)
+            if (fromMinutes == toMinutes)
             {
                 return false;
             }
 
-            if (nightStartHour < nightEndHour)
+            if (fromMinutes < toMinutes)
             {
-                return hour >= nightStartHour && hour < nightEndHour;
+                return nowMinutes >= fromMinutes && nowMinutes < toMinutes;
             }
 
-            return hour >= nightStartHour || hour < nightEndHour;
+            return nowMinutes >= fromMinutes || nowMinutes < toMinutes;
         }
 
         public static AppSettings Load()
@@ -181,7 +206,9 @@ namespace SleepyFox
                     }
 
                     settings.nightStartHour = ReadInt(values, "NightStartHour", settings.nightStartHour);
+                    settings.nightStartMinute = ReadInt(values, "NightStartMinute", settings.nightStartMinute);
                     settings.nightEndHour = ReadInt(values, "NightEndHour", settings.nightEndHour);
+                    settings.nightEndMinute = ReadInt(values, "NightEndMinute", settings.nightEndMinute);
                     settings.idleMinutes = ReadInt(values, "IdleMinutes", settings.idleMinutes);
                     settings.actionDelayMinutes = ReadInt(values, "ActionDelayMinutes", settings.actionDelayMinutes);
                     settings.checkIntervalMinutes = ReadInt(values, "CheckIntervalMinutes", settings.checkIntervalMinutes);
@@ -211,7 +238,9 @@ namespace SleepyFox
                 List<string> lines = new List<string>();
                 lines.Add("# The Sleepy Fox: настройки. Приложение перезапишет файл при сохранении.");
                 lines.Add("NightStartHour=" + nightStartHour.ToString(CultureInfo.InvariantCulture));
+                lines.Add("NightStartMinute=" + nightStartMinute.ToString(CultureInfo.InvariantCulture));
                 lines.Add("NightEndHour=" + nightEndHour.ToString(CultureInfo.InvariantCulture));
+                lines.Add("NightEndMinute=" + nightEndMinute.ToString(CultureInfo.InvariantCulture));
                 lines.Add("IdleMinutes=" + idleMinutes.ToString(CultureInfo.InvariantCulture));
                 lines.Add("ActionDelayMinutes=" + actionDelayMinutes.ToString(CultureInfo.InvariantCulture));
                 lines.Add("CheckIntervalMinutes=" + checkIntervalMinutes.ToString(CultureInfo.InvariantCulture));

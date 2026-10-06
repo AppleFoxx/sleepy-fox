@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -37,11 +37,11 @@ namespace SleepyFox
 
     /// <summary>
     /// Сама лиса: живёт в трее, по таймеру принюхивается к ночи и к бездействию,
-    /// ставит видео на паузу и укладывает ноутбук спать.
+    /// ставит видео на паузу и укладывает компьютер спать.
     /// </summary>
     internal sealed class SleepyFoxContext : ApplicationContext
     {
-        public const string AppVersion = "1.0.1";
+        public const string AppVersion = "1.0.2";
 
         private const string StateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
@@ -99,16 +99,16 @@ namespace SleepyFox
         {
             trayMenu = new ContextMenuStrip();
 
-            ToolStripMenuItem settingsItem = new ToolStripMenuItem("Настройки…");
+            ToolStripMenuItem settingsItem = new ToolStripMenuItem("Настройки...");
             settingsItem.Click += SettingsItemClick;
 
-            ToolStripMenuItem checkItem = new ToolStripMenuItem("Проверить сейчас");
+            ToolStripMenuItem checkItem = new ToolStripMenuItem("Проверить сейчас (о чём лиса думает)");
             checkItem.Click += CheckNowItemClick;
 
-            pauseItem = new ToolStripMenuItem("Пауза до утра");
+            pauseItem = new ToolStripMenuItem("Не усыплять сегодня");
             pauseItem.Click += PauseItemClick;
 
-            ToolStripMenuItem logItem = new ToolStripMenuItem("Журнал…");
+            ToolStripMenuItem logItem = new ToolStripMenuItem("Журнал...");
             logItem.Click += LogItemClick;
 
             ToolStripMenuItem aboutItem = new ToolStripMenuItem("О программе");
@@ -140,12 +140,12 @@ namespace SleepyFox
         {
             if (pausedUntilMorning)
             {
-                pauseItem.Text = "Возобновить";
+                pauseItem.Text = "Возобновить слежку";
                 pauseItem.Checked = true;
             }
             else
             {
-                pauseItem.Text = "Пауза до утра";
+                pauseItem.Text = "Не усыплять сегодня";
                 pauseItem.Checked = false;
             }
         }
@@ -171,13 +171,13 @@ namespace SleepyFox
 
             if (pausedUntilMorning)
             {
-                Logger.Log("пауза до утра: свернулась клубком и не трогаю ноутбук");
-                Balloon("Пауза до утра", "Лиса не трогает ноутбук до утра.");
+                Logger.Log("пауза до утра: свернулась клубком и не трогаю компьютер");
+                Balloon("Пауза до утра", "Лиса не трогает компьютер до утра.");
             }
             else
             {
                 Logger.Log("возобновляю работу: пауза до утра снята");
-                Balloon("The Sleepy Fox", "Лиса снова следит за ноутбуком.");
+                Balloon("The Sleepy Fox", "Лиса снова следит за компьютером.");
             }
         }
 
@@ -195,7 +195,7 @@ namespace SleepyFox
                 "The Sleepy Fox — сонная лиса, версия " + AppVersion + Environment.NewLine +
                 Environment.NewLine +
                 "Ночью, если вы давно не трогали мышь и клавиатуру, лиса поставит видео " +
-                "на паузу и через заданное время уложит ноутбук спать." + Environment.NewLine +
+                "на паузу и через заданное время уложит компьютер спать." + Environment.NewLine +
                 Environment.NewLine +
                 "Настройки: " + AppPaths.SettingsFile + Environment.NewLine +
                 "Журнал: " + AppPaths.LogFile + Environment.NewLine +
@@ -227,8 +227,8 @@ namespace SleepyFox
                 ApplyCheckInterval();
                 ApplyAutoStart(false);
 
-                Logger.Log("настройки сохранены: ночь " + settings.NightStartHour + ":00–"
-                    + settings.NightEndHour + ":00, порог " + settings.IdleMinutes + " мин, действие через "
+                Logger.Log("настройки сохранены: " + NightWindowText()
+                    + ", порог " + settings.IdleMinutes + " мин, действие через "
                     + settings.ActionDelayMinutes + " мин, "
                     + (settings.UseHibernate ? "гибернация" : "сон")
                     + (settings.PauseMedia ? ", пауза видео" : ", без паузы видео")
@@ -283,7 +283,12 @@ namespace SleepyFox
             }
 
             DateTime now = DateTime.Now;
-            bool night = settings.IsNight(now);
+            int nowMinutes = now.Hour * 60 + now.Minute;
+            int fromMinutes = settings.NightStartHour * 60 + settings.NightStartMinute;
+            int toMinutes = settings.NightEndHour * 60 + settings.NightEndMinute;
+            bool night = fromMinutes != toMinutes && (fromMinutes < toMinutes
+                ? (nowMinutes >= fromMinutes && nowMinutes < toMinutes)
+                : (nowMinutes >= fromMinutes || nowMinutes < toMinutes));
             double idleMinutes = NativeMethods.GetIdleMinutes();
 
             // «Пауза до утра» сама снимается, когда ночь закончилась
@@ -302,7 +307,7 @@ namespace SleepyFox
                 return;
             }
 
-            string context = "[ночь=" + (night ? "True" : "False")
+            string context = "[" + NightWindowText() + ", ночь=" + (night ? "True" : "False")
                 + ", без ввода " + FormatMinutes(idleMinutes) + " мин]";
 
             if (!night)
@@ -438,18 +443,18 @@ namespace SleepyFox
                 if (!actionReported)
                 {
                     actionReported = true;
-                    Logger.Log(context + " режим проверки: я бы отправила ноутбук в " + actionName);
+                    Logger.Log(context + " режим проверки: я бы отправила компьютер в " + actionName);
 
                     if (!manual)
                     {
-                        Balloon("Режим проверки", "Я бы отправила ноутбук в " + actionName
+                        Balloon("Режим проверки", "Я бы отправила компьютер в " + actionName
                             + ", но включена галочка «только показывать».");
                     }
                 }
                 return;
             }
 
-            Logger.Log(context + " укладываю ноутбук спать (" + actionName + ")");
+            Logger.Log(context + " укладываю компьютер спать (" + actionName + ")");
 
             suspendInProgress = true;
             bool ok;
@@ -474,11 +479,11 @@ namespace SleepyFox
 
             if (ok)
             {
-                Logger.Log("просыпаюсь: ноутбук вернулся, продолжаю следить");
+                Logger.Log("просыпаюсь: компьютер вернулся, продолжаю следить");
             }
             else
             {
-                Logger.Log("не получилось уложить ноутбук в " + actionName
+                Logger.Log("не получилось уложить компьютер в " + actionName
                     + " — возможно, она отключена в системе; попробую на следующей проверке");
             }
         }
@@ -588,6 +593,19 @@ namespace SleepyFox
             }
 
             return ((int)Math.Round(minutes)).ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>Ночное окно словами: «ночь 23:00–07:00».</summary>
+        private string NightWindowText()
+        {
+            return "ночь " + FormatClock(settings.NightStartHour, settings.NightStartMinute)
+                + "–" + FormatClock(settings.NightEndHour, settings.NightEndMinute);
+        }
+
+        private static string FormatClock(int hour, int minute)
+        {
+            return hour.ToString("00", CultureInfo.InvariantCulture) + ":"
+                + minute.ToString("00", CultureInfo.InvariantCulture);
         }
 
         private static string FormatPeak(float peak)
