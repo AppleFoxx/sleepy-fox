@@ -87,11 +87,11 @@ Russian, since this is a small home utility. The window has:
 | Setting | Meaning | Default |
 |---|---|---|
 | Ночь с / до | Night window in hours (0–23) and minutes (0–59). May cross midnight: from 23:00 to 07:00. | 23:00 → 07:00 |
-| Считать заснувшей после, мин | Minutes without mouse/keyboard input before we assume you fell asleep. | 60 |
-| Уходить в сон/гибернацию через, мин | Minutes after the video is paused and no input before suspending. | 15 |
+| Считать заснувшим после, мин | Minutes without mouse/keyboard input before we assume you fell asleep. | 60 |
+| Уходить в сон или гибернацию через, мин | Minutes after the video is paused and no input before suspending. | 15 |
 | Гибернация / Сон | What to do: hibernate or sleep. | Hibernate |
-| Ставить видео на паузу | Send the play/pause key when sound is playing. | On |
-| Только показывать, ничего не делать | Dry run: log only, never press keys, never suspend. | Off |
+| Ставить видео на паузу, если идёт звук | Send the play/pause key when sound is playing. | On |
+| Только показывать, ничего не делать (режим проверки) | Dry run: log only, never press keys, never suspend. | Off |
 | Проверять каждые, мин | How often to look at the clock and the idle timer. | 5 |
 | Запускать при входе в систему | Write `SleepyFox` into `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`. | Off |
 
@@ -101,8 +101,8 @@ read at startup and written when you press **Сохранить**.
 ## Tray menu
 
 * **Настройки…** — the settings window (double-clicking the icon does the same).
-* **Проверить сейчас** — run one check immediately and show the result in a balloon tip.
-* **Пауза до утра** / **Возобновить** — temporarily stop doing anything. The flag lives in
+* **Проверить сейчас (о чём лиса думает)** — run one check immediately and show the result in a balloon tip.
+* **Не усыплять сегодня** / **Возобновить слежку** — temporarily stop doing anything. The flag lives in
   memory only; it is not written to the settings file. It clears itself once the night
   window ends.
 * **Журнал…** — the last 200 log lines, with a link to open the log file in Notepad.
@@ -197,19 +197,20 @@ MIT — see [LICENSE](LICENSE).
 Настройки лежат в `%APPDATA%\SleepyFox\settings.ini` простым текстом.
 
 * «ночь с» и «до» — часы 0–23 и минуты 0–59, окно может переходить через полночь (с 23:00 до 07:00);
-* «считать заснувшей после» — минут без мыши и клавиатуры (по умолчанию 60);
-* «уходить в сон/гибернацию через» — минут после паузы (по умолчанию 15);
+* «считать заснувшим после» — минут без мыши и клавиатуры (по умолчанию 60);
+* «уходить в сон или гибернацию через» — минут после паузы (по умолчанию 15);
 * «Гибернация» или «Сон» (по умолчанию гибернация);
-* «Ставить видео на паузу» (включено);
-* «Только показывать, ничего не делать» (выключено; на первый запуск лучше включить);
+* «Ставить видео на паузу, если идёт звук» (включено);
+* «Только показывать, ничего не делать (режим проверки)» (выключено; на первый запуск лучше включить);
 * «Проверять каждые» — минут (по умолчанию 5);
 * «Запускать при входе в систему» — пишет или удаляет значение `SleepyFox` в
   `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`.
 
 ## Меню в трее
 
-«Настройки…», «Проверить сейчас», «Пауза до утра» / «Возобновить», «Журнал…»,
-«О программе», «Выход». «Пауза до утра» живёт только в памяти, в файл настроек не
+«Настройки...», «Проверить сейчас (о чём лиса думает)», «Не усыплять сегодня» /
+«Возобновить слежку», «Журнал...», «О программе», «Выход». «Не усыплять сегодня» живёт
+только в памяти, в файл настроек не
 сохраняется и снимается сама, когда ночное окно заканчивается.
 
 ## Честные ограничения
