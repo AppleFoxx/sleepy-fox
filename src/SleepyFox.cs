@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -41,7 +41,7 @@ namespace SleepyFox
     /// </summary>
     internal sealed class SleepyFoxContext : ApplicationContext
     {
-        public const string AppVersion = "1.0.0";
+        public const string AppVersion = "1.0.1";
 
         private const string StateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 

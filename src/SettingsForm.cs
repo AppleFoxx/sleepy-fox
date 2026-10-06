@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -146,6 +146,13 @@ namespace SleepyFox
             safeGroup.Controls.Add(dryHint);
 
             // --- прочее -------------------------------------------------------
+            // Раньше эти четыре группы создавались, но на форму не добавлялись:
+            // в окне настроек оставались видны только галочка автозапуска, путь и кнопки.
+            Controls.Add(nightGroup);
+            Controls.Add(sleepGroup);
+            Controls.Add(actionGroup);
+            Controls.Add(safeGroup);
+
             runAtLogonBox = new CheckBox();
             runAtLogonBox.Text = "Запускать при входе в систему";
             runAtLogonBox.AutoSize = true;
