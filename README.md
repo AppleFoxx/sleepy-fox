@@ -166,10 +166,8 @@ no files in Program Files, no shortcuts, no scheduled tasks, no services.
   noticed the idle time, paused a playing video with the media key, correctly did *not*
   count its own keypress as the user coming back (this was a real bug, found and fixed the
   same night), and put the machine into hibernation. The journal recorded every step.
-* **What is not verified yet:** the real end-to-end night action - actually pausing a
-  playing video with the media key and then sending the machine to hibernation - has not
-  happened on a live machine yet; the first real night is still ahead. Only Windows 11
-  (25H2) has been used so far; Windows 10 is supported by the code but untested.
+* **What is not verified yet:** only Windows 11 (25H2) has been used so far; Windows 10 is
+  supported by the code but untested. There is no macOS version.
 
 ## License
 
@@ -279,10 +277,8 @@ MIT — see [LICENSE](LICENSE).
   бездействие, поставило играющее видео на паузу медиаклавишей, правильно НЕ засчитало
   собственное нажатие за возвращение человека (это была настоящая ошибка, найденная и
   исправленная в ту же ночь) и уложило компьютер в гибернацию. Каждый шаг записан в журнал.
-* **Что ещё не проверено:** настоящее ночное действие целиком - реальная пауза играющего
-  видео медиаклавишей и последующая гибернация - на живой машине пока не происходило,
-  первая настоящая ночь ещё впереди. Использовалась только Windows 11 (25H2); Windows 10
-  код поддерживает, но на ней не проверялось.
+* **Что ещё не проверено:** использовалась только Windows 11 (25H2); Windows 10 код
+  поддерживает, но на ней не проверялось. Версии под macOS нет.
 
 ## Лицензия
 
