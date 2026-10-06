@@ -142,10 +142,17 @@ no files in Program Files, no shortcuts, no scheduled tasks, no services.
   users are not coordinated.
 * **The tray icon is drawn in code** (a crescent and a `Z`), so it looks simple and is
   scaled by Windows. A real fox icon is still on the wish list.
-* **Not code-signed**, so SmartScreen may warn you the first time. That is expected for a
-  private build.
-* **Not tested on a live machine by the author of this repository snapshot.** The build and
-  the actual hibernation behaviour have to be verified on real Windows hardware.
+* **Not code-signed yet**, so SmartScreen may warn you the first time. An application for
+  the free SignPath Foundation certificate has been submitted.
+* **What is verified so far:** the project builds both on GitHub Actions (`windows-latest`)
+  and with the in-box `csc.exe` on Windows 11; the dry-run mode has been running on a live
+  Windows 11 laptop, where it correctly detected the night window and the idle time and
+  wrote both to the journal; the settings window, the tray menu and the autostart entry
+  were all used on that same machine.
+* **What is not verified yet:** the real end-to-end night action - actually pausing a
+  playing video with the media key and then sending the machine to hibernation - has not
+  happened on a live machine yet; the first real night is still ahead. Only Windows 11
+  (25H2) has been used so far; Windows 10 is supported by the code but untested.
 
 ## License
 
@@ -231,9 +238,16 @@ MIT — see [LICENSE](LICENSE).
 * Один экземпляр на сеанс Windows; разные пользователи между собой не согласуются.
 * Значок трея рисуется программно (месяц и буква Z) — настоящую иконку лисы ещё
   предстоит добавить.
-* Подписи кода нет, поэтому SmartScreen при первом запуске может предупредить.
-* **На живой машине это ещё не проверялось:** сборка и реальное поведение при
-  гибернации требуют проверки на настоящей Windows.
+* Подписи кода пока нет, поэтому SmartScreen при первом запуске может предупредить.
+  Заявка на бесплатный сертификат фонда SignPath уже отправлена.
+* **Что уже проверено:** проект собирается и в облаке GitHub (windows-latest), и
+  встроенным компилятором на Windows 11; режим проверки работал на живом ноутбуке с
+  Windows 11 и правильно определял ночное окно и время бездействия, записывая это в
+  журнал; окно настроек, меню в трее и автозапуск на этой же машине использовались.
+* **Что ещё не проверено:** настоящее ночное действие целиком - реальная пауза играющего
+  видео медиаклавишей и последующая гибернация - на живой машине пока не происходило,
+  первая настоящая ночь ещё впереди. Использовалась только Windows 11 (25H2); Windows 10
+  код поддерживает, но на ней не проверялось.
 
 ## Лицензия
 
