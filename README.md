@@ -71,7 +71,7 @@ The exe lands in `src\bin\Release\SleepyFox.exe`. This is also what
 
 ## First run — read this
 
-1. Build the exe and run it. A small crescent-moon icon with a `Z` appears in the tray.
+1. Build the exe and run it. A small sleeping fox appears in the tray.
 2. Right-click the icon → **Настройки…**
 3. **Turn on "Только показывать, ничего не делать" for the first night.** In that mode the
    fox only writes to the log file, so you can see exactly what it would have done without
@@ -144,8 +144,10 @@ no files in Program Files, no shortcuts, no scheduled tasks, no services.
   threshold or use the night window to narrow when it may act.
 * **One instance per session.** A second launch just shows a message. Separate Windows
   users are not coordinated.
-* **The tray icon is drawn in code** (a crescent and a `Z`), so it looks simple and is
-  scaled by Windows. A real fox icon is still on the wish list.
+* **The tray icon is the real fox icon.** The same `src\fox.ico` is embedded twice: as the
+  exe's own icon (so Explorer shows it on the file) and as an assembly resource, which the
+  program loads at run time at the size Windows expects for the tray. If that embedded
+  resource is ever missing or unreadable, the fox falls back to the simple icon drawn in code.
 * **No network access, with one exception.** The program does not go online at startup, on a
   timer, or in the background: no telemetry, no analytics, no crash reports, no automatic
   update checks. The single request it can make happens only when you choose **Проверить
@@ -255,8 +257,10 @@ MIT — see [LICENSE](LICENSE).
 * Бездействие — не то же самое, что сон: если вы час сидите неподвижно под ночным видео,
   лиса решит, что вы уснули. Поднимите порог или сузьте ночное окно.
 * Один экземпляр на сеанс Windows; разные пользователи между собой не согласуются.
-* Значок трея рисуется программно (месяц и буква Z) — настоящую иконку лисы ещё
-  предстоит добавить.
+* **Значок трея — настоящая иконка лисы.** Та же `src\fox.ico` встроена в программу
+  дважды: как значок самого файла (его видно в Проводнике) и как ресурс сборки, откуда
+  приложение берёт её в размере, который Windows ждёт для трея. Если этот ресурс вдруг
+  пропадёт или не прочитается, лиса вернётся к простому значку, нарисованному кодом.
 * **В сеть программа не ходит — кроме одного случая.** Ни при запуске, ни по таймеру, ни в
   фоне: ни телеметрии, ни аналитики, ни отчётов об ошибках, ни автоматической проверки
   обновлений. Единственный запрос возможен только тогда, когда вы сами выберете в меню

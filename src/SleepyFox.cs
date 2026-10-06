@@ -41,7 +41,7 @@ namespace SleepyFox
     /// </summary>
     internal sealed class SleepyFoxContext : ApplicationContext
     {
-        public const string AppVersion = "1.0.4";
+        public const string AppVersion = "1.0.6";
 
         private const string StateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 

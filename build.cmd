@@ -25,6 +25,8 @@ echo [SleepyFox] Compiling src\*.cs ...
 "%CSC%" /nologo /target:winexe /platform:anycpu /optimize+ /codepage:65001 ^
     /out:bin\SleepyFox.exe ^
     /win32manifest:src\app.manifest ^
+    /win32icon:src\fox.ico ^
+    /resource:src\fox.ico,fox.ico ^
     /reference:System.dll ^
     /reference:System.Windows.Forms.dll ^
     /reference:System.Drawing.dll ^

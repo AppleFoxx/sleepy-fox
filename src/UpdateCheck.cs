@@ -115,6 +115,19 @@ namespace SleepyFox
 
             try
             {
+                // Катя, 07.10.2026: на её ноутбуке .NET выбрал для запроса старый протокол,
+                // и запрос падал с «Не удалось создать защищённый канал SSL/TLS».
+                // Прописываем TLS 1.2 явно - GitHub без него не отвечает.
+                try
+                {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                }
+                catch (NotSupportedException)
+                {
+                    // на очень старых системах TLS 1.2 может быть неизвестен - тогда
+                    // оставляем как есть и покажем честную ошибку ниже
+                }
+
                 request = (HttpWebRequest)WebRequest.Create(LatestReleaseApi);
                 request.UserAgent = UserAgent;
                 request.Method = "GET";
