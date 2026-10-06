@@ -1,0 +1,29 @@
+name: build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build SleepyFox.exe
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build with MSBuild (.NET Framework 4.8)
+        run: msbuild src\SleepyFox.csproj /p:Configuration=Release /p:Platform=AnyCPU /v:minimal /nologo
+
+      - name: Upload SleepyFox.exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: SleepyFox
+          path: src\bin\Release\SleepyFox.exe
+          if-no-files-found: error

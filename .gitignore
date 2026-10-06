@@ -1,0 +1,128 @@
+# ---------------------------------------------------------------------------
+# The Sleepy Fox — .gitignore
+# ---------------------------------------------------------------------------
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+build/
+bld/
+[Ll]og/
+[Ll]ogs/
+
+# Executables and libraries
+*.exe
+*.dll
+*.pdb
+*.mdb
+*.obj
+*.o
+*.so
+*.lib
+*.exp
+*.ildb
+*.ilk
+*.exe.config
+*.dll.config
+*.vshost.exe
+*.vshost.exe.config
+*.vshost.exe.manifest
+
+# Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.DotSettings.user
+*.rsuser
+*.VC.db
+*.VC.VC.opendb
+*.aps
+*.ncb
+*.sdf
+*.opensdf
+*.cachefile
+*.psess
+*.vsp
+*.vspx
+*.sap
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+*.pfx
+*.publishsettings
+publish/
+Publish/
+*.publishproj
+*.pubxml
+*.pubxml.user
+*.csproj.user
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+.nuget/
+
+# Test / coverage
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+coverage*.info
+TestResults/
+*.VisualState.xml
+*.testsettings
+
+# MSTest / dotCover / NCrunch
+[Tt]est[Rr]esult/
+*.dotCover.*
+*.ncrunch*
+*.*crunch*.local.xml
+_DotNetAgeCheck
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+*.stackdump
+[Dd]esktop.ini
+
+# Installer / temp files
+*.tmp
+*.temp
+*.log
+*.bak
+*.orig
+*.rej
+*~
+*.swp
+*.swo
+~$*
+
+# Runtime data (never commit a user's own settings or log)
+settings.ini
+state.txt
+sleepyfox.log

@@ -1,0 +1,11 @@
+# Batch files must keep Windows line endings, otherwise cmd.exe can stumble.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Windows-only project files
+*.csproj text eol=crlf
+*.manifest text eol=crlf
+
+# Shell/GitHub files are happier with LF
+*.yml text eol=lf
+*.sh text eol=lf
