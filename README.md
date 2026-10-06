@@ -147,8 +147,9 @@ no files in Program Files, no shortcuts, no scheduled tasks, no services.
 * **What is verified so far:** the project builds both on GitHub Actions (`windows-latest`)
   and with the in-box `csc.exe` on Windows 11; the dry-run mode has been running on a live
   Windows 11 laptop, where it correctly detected the night window and the idle time and
-  wrote both to the journal; the settings window, the tray menu and the autostart entry
-  were all used on that same machine.
+  wrote both to the journal; the settings window was opened there and its settings were
+  saved through it, the tray menu was used (including "Не усыплять сегодня"), and the
+  autostart entry was created - none of them has been exercised again since.
 * **What is not verified yet:** the real end-to-end night action - actually pausing a
   playing video with the media key and then sending the machine to hibernation - has not
   happened on a live machine yet; the first real night is still ahead. Only Windows 11
@@ -243,7 +244,9 @@ MIT — see [LICENSE](LICENSE).
 * **Что уже проверено:** проект собирается и в облаке GitHub (windows-latest), и
   встроенным компилятором на Windows 11; режим проверки работал на живом ноутбуке с
   Windows 11 и правильно определял ночное окно и время бездействия, записывая это в
-  журнал; окно настроек, меню в трее и автозапуск на этой же машине использовались.
+  журнал; окно настроек на этой же машине открывали и сохраняли через него настройки,
+  меню в трее использовали (в том числе «Не усыплять сегодня»), запись автозапуска
+  создана - но ни одно из этого с тех пор не проверялось повторно.
 * **Что ещё не проверено:** настоящее ночное действие целиком - реальная пауза играющего
   видео медиаклавишей и последующая гибернация - на живой машине пока не происходило,
   первая настоящая ночь ещё впереди. Использовалась только Windows 11 (25H2); Windows 10
