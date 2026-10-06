@@ -52,6 +52,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="SettingsForm.cs" />
     <Compile Include="SleepyFox.cs" />
+    <Compile Include="UpdateCheck.cs" />
     <None Include="app.manifest" />
   </ItemGroup>
 

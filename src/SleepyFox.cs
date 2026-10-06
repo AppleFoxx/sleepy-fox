@@ -41,7 +41,7 @@ namespace SleepyFox
     /// </summary>
     internal sealed class SleepyFoxContext : ApplicationContext
     {
-        public const string AppVersion = "1.0.2";
+        public const string AppVersion = "1.0.4";
 
         private const string StateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
@@ -67,6 +67,14 @@ namespace SleepyFox
 
         /// <summary>Защита от повторного входа, пока система уходит в сон.</summary>
         private bool suspendInProgress;
+
+        /// <summary>
+        /// Своё нажатие медиаклавиши: Windows считает его вводом пользователя и обнуляет
+        /// счётчик бездействия. Храним сырое время и момент нажатия, чтобы досчитать бездействие.
+        /// </summary>
+        private uint ownPressTick;
+        private DateTime ownPressAt;
+        private bool ownPressKnown;
 
         public SleepyFoxContext()
         {
@@ -111,6 +119,9 @@ namespace SleepyFox
             ToolStripMenuItem logItem = new ToolStripMenuItem("Журнал...");
             logItem.Click += LogItemClick;
 
+            ToolStripMenuItem updateItem = new ToolStripMenuItem("Проверить обновления");
+            updateItem.Click += UpdateItemClick;
+
             ToolStripMenuItem aboutItem = new ToolStripMenuItem("О программе");
             aboutItem.Click += AboutItemClick;
 
@@ -122,6 +133,7 @@ namespace SleepyFox
             trayMenu.Items.Add(pauseItem);
             trayMenu.Items.Add(logItem);
             trayMenu.Items.Add(new ToolStripSeparator());
+            trayMenu.Items.Add(updateItem);
             trayMenu.Items.Add(aboutItem);
             trayMenu.Items.Add(exitItem);
             trayMenu.Opening += TrayMenuOpening;
@@ -187,6 +199,14 @@ namespace SleepyFox
             {
                 form.ShowDialog();
             }
+        }
+
+        /// <summary>
+        /// Единственное действие, которое ходит в сеть, — и только по нажатию человека.
+        /// </summary>
+        private void UpdateItemClick(object sender, EventArgs e)
+        {
+            UpdateCheck.CheckForUpdates();
         }
 
         private void AboutItemClick(object sender, EventArgs e)
@@ -289,7 +309,7 @@ namespace SleepyFox
             bool night = fromMinutes != toMinutes && (fromMinutes < toMinutes
                 ? (nowMinutes >= fromMinutes && nowMinutes < toMinutes)
                 : (nowMinutes >= fromMinutes || nowMinutes < toMinutes));
-            double idleMinutes = NativeMethods.GetIdleMinutes();
+            double idleMinutes = CurrentIdleMinutes();
 
             // «Пауза до утра» сама снимается, когда ночь закончилась
             if (pausedUntilMorning && !night)
@@ -377,6 +397,28 @@ namespace SleepyFox
         }
 
         /// <summary>
+        /// Минуты бездействия с поправкой на собственное нажатие медиаклавиши.
+        /// Пока последним вводом в системе остаётся наше нажатие, время бездействия
+        /// продолжает расти так, как будто мы ничего не нажимали. Как только человек
+        /// по-настоящему тронет мышь или клавиатуру, dwTime изменится и поправка отключится.
+        /// </summary>
+        private double CurrentIdleMinutes()
+        {
+            double idleMinutes = NativeMethods.GetIdleMinutes();
+
+            if (ownPressKnown && NativeMethods.GetLastInputTick() == ownPressTick)
+            {
+                double extra = (DateTime.Now - ownPressAt).TotalMinutes;
+                if (extra > 0.0 && extra < 720.0)
+                {
+                    idleMinutes += extra;
+                }
+            }
+
+            return idleMinutes;
+        }
+
+        /// <summary>
         /// Пик звука решает всё: клавиша play/pause — переключатель, и слепое нажатие
         /// может не поставить видео на паузу, а наоборот запустить его.
         /// </summary>
@@ -430,7 +472,24 @@ namespace SleepyFox
             }
 
             Logger.Log(context + " звук идёт (пик " + FormatPeak(peak) + "), ставлю паузу");
+
+            uint beforeTick = NativeMethods.GetLastInputTick();
             NativeMethods.SendPlayPauseKey();
+            System.Threading.Thread.Sleep(150);
+            uint afterTick = NativeMethods.GetLastInputTick();
+
+            if (afterTick != beforeTick)
+            {
+                ownPressTick = afterTick;
+                ownPressAt = DateTime.Now;
+
+                if (!ownPressKnown)
+                {
+                    ownPressKnown = true;
+                    Logger.Log("запоминаю своё нажатие: оно не должно считаться возвращением человека");
+                }
+            }
+
             Balloon("The Sleepy Fox", "Похоже, вы уснули: поставила видео на паузу.");
         }
 

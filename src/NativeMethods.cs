@@ -62,6 +62,26 @@ namespace SleepyFox
         }
 
         /// <summary>
+        /// Сырое время последнего ввода: поле dwTime структуры LASTINPUTINFO,
+        /// то есть значение GetTickCount на момент последнего ввода.
+        /// Нужно, чтобы отличить настоящее возвращение человека от собственного нажатия клавиши.
+        /// Возвращает 0, если прочитать не удалось.
+        /// </summary>
+        public static uint GetLastInputTick()
+        {
+            LastInputInfo info = new LastInputInfo();
+            info.cbSize = (uint)Marshal.SizeOf(typeof(LastInputInfo));
+            info.dwTime = 0;
+
+            if (!GetLastInputInfo(ref info))
+            {
+                return 0;
+            }
+
+            return info.dwTime;
+        }
+
+        /// <summary>
         /// Нажимает мультимедийную клавишу play/pause.
         /// Клавиша работает как переключатель, поэтому жать её можно только тогда,
         /// когда точно известно, что звук сейчас идёт.

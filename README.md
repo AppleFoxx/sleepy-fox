@@ -106,6 +106,10 @@ read at startup and written when you press **Сохранить**.
   memory only; it is not written to the settings file. It clears itself once the night
   window ends.
 * **Журнал…** — the last 200 log lines, with a link to open the log file in Notepad.
+* **Проверить обновления** — the only network request the program ever makes, and only when you
+  pick this item yourself: it asks GitHub once for the number of the latest release and tells you
+  whether a newer version exists. Nothing about you is sent. If you never pick it, the program
+  never touches the network.
 * **О программе** — short help and the version.
 * **Выход** — stop and remove the tray icon.
 
@@ -142,6 +146,12 @@ no files in Program Files, no shortcuts, no scheduled tasks, no services.
   users are not coordinated.
 * **The tray icon is drawn in code** (a crescent and a `Z`), so it looks simple and is
   scaled by Windows. A real fox icon is still on the wish list.
+* **No network access, with one exception.** The program does not go online at startup, on a
+  timer, or in the background: no telemetry, no analytics, no crash reports, no automatic
+  update checks. The single request it can make happens only when you choose **Проверить
+  обновления** in the tray menu — then it asks GitHub once for the latest release number and
+  sends nothing about you (no identifiers, no settings, no usage data). If you never pick that
+  item, the fox never touches the network.
 * **Not code-signed yet**, so SmartScreen may warn you the first time. An application for
   the free SignPath Foundation certificate has been submitted.
 * **What is verified so far:** the project builds both on GitHub Actions (`windows-latest`)
@@ -149,7 +159,11 @@ no files in Program Files, no shortcuts, no scheduled tasks, no services.
   Windows 11 laptop, where it correctly detected the night window and the idle time and
   wrote both to the journal; the settings window was opened there and its settings were
   saved through it, the tray menu was used (including "Не усыплять сегодня"), and the
-  autostart entry was created - none of them has been exercised again since.
+  autostart entry was created.
+* **On 2026-10-07 the whole chain was verified on a live Windows 11 laptop:** the app
+  noticed the idle time, paused a playing video with the media key, correctly did *not*
+  count its own keypress as the user coming back (this was a real bug, found and fixed the
+  same night), and put the machine into hibernation. The journal recorded every step.
 * **What is not verified yet:** the real end-to-end night action - actually pausing a
   playing video with the media key and then sending the machine to hibernation - has not
   happened on a live machine yet; the first real night is still ahead. Only Windows 11
@@ -217,9 +231,13 @@ MIT — see [LICENSE](LICENSE).
 ## Меню в трее
 
 «Настройки...», «Проверить сейчас (о чём лиса думает)», «Не усыплять сегодня» /
-«Возобновить слежку», «Журнал...», «О программе», «Выход». «Не усыплять сегодня» живёт
-только в памяти, в файл настроек не
+«Возобновить слежку», «Журнал...», «Проверить обновления», «О программе», «Выход».
+«Не усыплять сегодня» живёт только в памяти, в файл настроек не
 сохраняется и снимается сама, когда ночное окно заканчивается.
+
+«Проверить обновления» — это единственное обращение в сеть, и только по вашему нажатию:
+лиса один раз спрашивает у GitHub номер последней версии и говорит, вышла ли новая.
+Никаких данных о вас она при этом не отправляет. Не нажимать — значит вообще не ходить в сеть.
 
 ## Честные ограничения
 
@@ -239,6 +257,12 @@ MIT — see [LICENSE](LICENSE).
 * Один экземпляр на сеанс Windows; разные пользователи между собой не согласуются.
 * Значок трея рисуется программно (месяц и буква Z) — настоящую иконку лисы ещё
   предстоит добавить.
+* **В сеть программа не ходит — кроме одного случая.** Ни при запуске, ни по таймеру, ни в
+  фоне: ни телеметрии, ни аналитики, ни отчётов об ошибках, ни автоматической проверки
+  обновлений. Единственный запрос возможен только тогда, когда вы сами выберете в меню
+  трея «Проверить обновления»: тогда лиса один раз спрашивает у GitHub номер последней
+  версии и больше ничего никуда не отправляет — ни данных о вас, ни настроек, ни сведений
+  об использовании. Не нажимать этот пункт — значит вообще не выходить в сеть.
 * Подписи кода пока нет, поэтому SmartScreen при первом запуске может предупредить.
   Заявка на бесплатный сертификат фонда SignPath уже отправлена.
 * **Что уже проверено:** проект собирается и в облаке GitHub (windows-latest), и
@@ -246,7 +270,11 @@ MIT — see [LICENSE](LICENSE).
   Windows 11 и правильно определял ночное окно и время бездействия, записывая это в
   журнал; окно настроек на этой же машине открывали и сохраняли через него настройки,
   меню в трее использовали (в том числе «Не усыплять сегодня»), запись автозапуска
-  создана - но ни одно из этого с тех пор не проверялось повторно.
+  создана.
+* **07.10.2026 весь цикл проверен на живом ноутбуке с Windows 11:** приложение увидело
+  бездействие, поставило играющее видео на паузу медиаклавишей, правильно НЕ засчитало
+  собственное нажатие за возвращение человека (это была настоящая ошибка, найденная и
+  исправленная в ту же ночь) и уложило компьютер в гибернацию. Каждый шаг записан в журнал.
 * **Что ещё не проверено:** настоящее ночное действие целиком - реальная пауза играющего
   видео медиаклавишей и последующая гибернация - на живой машине пока не происходило,
   первая настоящая ночь ещё впереди. Использовалась только Windows 11 (25H2); Windows 10
