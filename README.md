@@ -162,10 +162,13 @@ no files in Program Files, no shortcuts, no scheduled tasks, no services.
   wrote both to the journal; the settings window was opened there and its settings were
   saved through it, the tray menu was used (including "Не усыплять сегодня"), and the
   autostart entry was created.
-* **On 2026-10-07 the whole chain was verified on a live Windows 11 laptop:** the app
-  noticed the idle time, paused a playing video with the media key, correctly did *not*
-  count its own keypress as the user coming back (this was a real bug, found and fixed the
-  same night), and put the machine into hibernation. The journal recorded every step.
+* **The whole chain has run on a live Windows 11 laptop.** On the night of 2026-10-06 → 07
+  the app noticed the idle time, paused a playing video with the media key and put the
+  machine into hibernation. That first real night also exposed a bug: the app counted its
+  *own* media-key press as the user coming back, reset the sleep mark, and so never reached
+  hibernation with realistic thresholds. The fix — carry over the idle accumulated *before*
+  the press instead of the time since it — shipped in 1.0.7 and was confirmed by a live
+  short-interval run on 2026-10-07. The journal recorded every step.
 * **What is not verified yet:** only Windows 11 (25H2) has been used so far; Windows 10 is
   supported by the code but untested. There is no macOS version.
 
@@ -273,10 +276,13 @@ MIT — see [LICENSE](LICENSE).
   журнал; окно настроек на этой же машине открывали и сохраняли через него настройки,
   меню в трее использовали (в том числе «Не усыплять сегодня»), запись автозапуска
   создана.
-* **07.10.2026 весь цикл проверен на живом ноутбуке с Windows 11:** приложение увидело
-  бездействие, поставило играющее видео на паузу медиаклавишей, правильно НЕ засчитало
-  собственное нажатие за возвращение человека (это была настоящая ошибка, найденная и
-  исправленная в ту же ночь) и уложило компьютер в гибернацию. Каждый шаг записан в журнал.
+* **Весь цикл отработал на живом ноутбуке с Windows 11.** В ночь с 06 на 07.10.2026
+  приложение увидело бездействие, поставило играющее видео на паузу медиаклавишей и
+  уложило компьютер в гибернацию. Тот же первый настоящий запуск вскрыл ошибку:
+  приложение засчитывало **своё же** нажатие медиаклавиши за возвращение человека,
+  сбрасывало отметку сна и с реальными порогами до гибернации не доходило. Исправление —
+  переносить бездействие, накопленное **до** нажатия, а не время с момента, — вышло в 1.0.7
+  и подтверждено живым коротким прогоном 07.10.2026. Каждый шаг записан в журнал.
 * **Что ещё не проверено:** использовалась только Windows 11 (25H2); Windows 10 код
   поддерживает, но на ней не проверялось. Версии под macOS нет.
 
