@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -41,7 +41,7 @@ namespace SleepyFox
     /// </summary>
     internal sealed class SleepyFoxContext : ApplicationContext
     {
-        public const string AppVersion = "1.0.6";
+        public const string AppVersion = "1.0.7";
 
         private const string StateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
@@ -70,10 +70,11 @@ namespace SleepyFox
 
         /// <summary>
         /// Своё нажатие медиаклавиши: Windows считает его вводом пользователя и обнуляет
-        /// счётчик бездействия. Храним сырое время и момент нажатия, чтобы досчитать бездействие.
+        /// счётчик бездействия. Храним сырое время нажатия и бездействие, накопленное ДО него,
+        /// чтобы честно досчитать бездействие после.
         /// </summary>
         private uint ownPressTick;
-        private DateTime ownPressAt;
+        private double ownPressIdle;
         private bool ownPressKnown;
 
         public SleepyFoxContext()
@@ -398,9 +399,11 @@ namespace SleepyFox
 
         /// <summary>
         /// Минуты бездействия с поправкой на собственное нажатие медиаклавиши.
-        /// Пока последним вводом в системе остаётся наше нажатие, время бездействия
-        /// продолжает расти так, как будто мы ничего не нажимали. Как только человек
-        /// по-настоящему тронет мышь или клавиатуру, dwTime изменится и поправка отключится.
+        /// Нажатие система считает вводом и обнуляет отсчёт, поэтому, пока последним
+        /// вводом остаётся именно наше нажатие, к отсчёту возвращается бездействие,
+        /// накопленное ДО него (ownPressIdle), — тогда время растёт так, как будто мы
+        /// ничего не нажимали. Как только человек по-настоящему тронет мышь или
+        /// клавиатуру, dwTime изменится и поправка отключится.
         /// </summary>
         private double CurrentIdleMinutes()
         {
@@ -408,10 +411,10 @@ namespace SleepyFox
 
             if (ownPressKnown && NativeMethods.GetLastInputTick() == ownPressTick)
             {
-                double extra = (DateTime.Now - ownPressAt).TotalMinutes;
-                if (extra > 0.0 && extra < 720.0)
+                double carried = ownPressIdle;
+                if (carried > 0.0 && carried < 720.0)
                 {
-                    idleMinutes += extra;
+                    idleMinutes += carried;
                 }
             }
 
@@ -474,6 +477,7 @@ namespace SleepyFox
             Logger.Log(context + " звук идёт (пик " + FormatPeak(peak) + "), ставлю паузу");
 
             uint beforeTick = NativeMethods.GetLastInputTick();
+            double beforeIdle = NativeMethods.GetIdleMinutes();
             NativeMethods.SendPlayPauseKey();
             System.Threading.Thread.Sleep(150);
             uint afterTick = NativeMethods.GetLastInputTick();
@@ -481,7 +485,7 @@ namespace SleepyFox
             if (afterTick != beforeTick)
             {
                 ownPressTick = afterTick;
-                ownPressAt = DateTime.Now;
+                ownPressIdle = beforeIdle;
 
                 if (!ownPressKnown)
                 {
