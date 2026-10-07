@@ -154,8 +154,8 @@ no files in Program Files, no shortcuts, no scheduled tasks, no services.
   обновления** in the tray menu — then it asks GitHub once for the latest release number and
   sends nothing about you (no identifiers, no settings, no usage data). If you never pick that
   item, the fox never touches the network.
-* **Not code-signed yet**, so SmartScreen may warn you the first time. An application for
-  the free SignPath Foundation certificate has been submitted.
+* **Not code-signed yet**, so SmartScreen may warn you the first time. An application for the
+  free SignPath Foundation certificate is pending — see [Code signing policy](#code-signing-policy).
 * **What is verified so far:** the project builds both on GitHub Actions (`windows-latest`)
   and with the in-box `csc.exe` on Windows 11; the dry-run mode has been running on a live
   Windows 11 laptop, where it correctly detected the night window and the idle time and
@@ -171,6 +171,23 @@ no files in Program Files, no shortcuts, no scheduled tasks, no services.
   short-interval run on 2026-10-07. The journal recorded every step.
 * **What is not verified yet:** only Windows 11 (25H2) has been used so far; Windows 10 is
   supported by the code but untested. There is no macOS version.
+
+## Code signing policy
+
+**Status: releases are not signed yet.** Windows SmartScreen may therefore warn on the first
+launch. An application for free code signing was submitted to the
+[SignPath Foundation](https://signpath.org); they asked us to come back once the project shows
+more usage, so there may be a wait. This section will be updated either way.
+
+When signing is in place, the policy is:
+
+* Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by
+  [SignPath Foundation](https://signpath.org).
+* **Roles.** Committers and reviewers: [Katya (AppleFoxx)](https://github.com/AppleFoxx).
+  Approvers: [Katya (AppleFoxx)](https://github.com/AppleFoxx) — every release is approved by hand.
+* **Privacy.** This program will not transfer any information to other networked systems unless
+  specifically requested by the user or the person installing or operating it. See
+  [PRIVACY.md](PRIVACY.md).
 
 ## License
 
@@ -269,7 +286,8 @@ MIT — see [LICENSE](LICENSE).
   версии и больше ничего никуда не отправляет — ни данных о вас, ни настроек, ни сведений
   об использовании. Не нажимать этот пункт — значит вообще не выходить в сеть.
 * Подписи кода пока нет, поэтому SmartScreen при первом запуске может предупредить.
-  Заявка на бесплатный сертификат фонда SignPath уже отправлена.
+  Заявка на бесплатный сертификат фонда SignPath подана и ждёт рассмотрения — подробности
+  в разделе «Политика подписи кода» ниже.
 * **Что уже проверено:** проект собирается и в облаке GitHub (windows-latest), и
   встроенным компилятором на Windows 11; режим проверки работал на живом ноутбуке с
   Windows 11 и правильно определял ночное окно и время бездействия, записывая это в
@@ -285,6 +303,22 @@ MIT — see [LICENSE](LICENSE).
   и подтверждено живым коротким прогоном 07.10.2026. Каждый шаг записан в журнал.
 * **Что ещё не проверено:** использовалась только Windows 11 (25H2); Windows 10 код
   поддерживает, но на ней не проверялось. Версии под macOS нет.
+
+## Политика подписи кода
+
+**Статус: релизы пока без подписи.** Поэтому Windows SmartScreen может предупредить при первом
+запуске. Заявку на бесплатную подпись подали в [SignPath Foundation](https://signpath.org); там
+попросили вернуться, когда проект наберёт больше пользователей, так что это вопрос времени.
+Раздел обновим в любом случае.
+
+Когда подпись появится, политика будет такой:
+
+* Бесплатная подпись кода — от [SignPath.io](https://about.signpath.io), сертификат —
+  [SignPath Foundation](https://signpath.org).
+* **Роли.** Коммиттеры и ревьюеры: [Катя (AppleFoxx)](https://github.com/AppleFoxx).
+  Утверждающие: [Катя (AppleFoxx)](https://github.com/AppleFoxx) — каждый релиз утверждается вручную.
+* **Приватность.** Программа не передаёт никаких данных другим сетевым системам, если этого явно
+  не запросил пользователь или тот, кто её устанавливает. Подробности — [PRIVACY.md](PRIVACY.md).
 
 ## Лицензия
 
