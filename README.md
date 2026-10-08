@@ -1,176 +1,90 @@
+<p align="center">
+  <img src="docs/logo.png" width="110" alt="The Sleepy Fox">
+</p>
+
 # The Sleepy Fox
 
-A tiny Windows tray app for the very common situation: you fall asleep in front of a
-laptop while watching a video. The video keeps playing, so Windows never goes to sleep
-on its own, and the laptop runs until morning.
+A tiny Windows tray app for a very common situation: you fall asleep in front of a laptop
+while a video plays. The video keeps playing, so Windows never goes to sleep on its own, and
+the machine runs until morning.
 
-**The Sleepy Fox** sits in the notification area, and at night — when the mouse and the
-keyboard have been untouched for a while — it pauses the video and, some minutes later,
-puts the machine into hibernation (or sleep, your choice).
+**What it does.** At night, when the mouse and keyboard have been untouched for a while, the
+fox pauses the video and some minutes later puts the machine into hibernation (or sleep — your
+choice). Before pressing play/pause it checks that sound is actually playing: the key is a
+toggle, so pressing it blind could *start* a video instead of pausing one.
 
-No installers, no services, no NuGet packages, no admin rights, and — under no
-circumstances — desktop shortcuts.
+`150 KB` · no installer · no services · no admin rights · MIT
 
----
+## Screenshots
 
-## What it does
+<p align="center">
+  <img src="docs/screenshots/menu.png" width="250" alt="Tray menu">
+  <img src="docs/screenshots/settings.png" width="330" alt="Settings">
+  <img src="docs/screenshots/journal.png" width="600" alt="Journal of a real night: pause at 23:58, hibernation at 00:13">
+</p>
 
-1. Every few minutes (5 by default) it asks Windows two questions:
-   * is it night now, according to the night window you configured (e.g. 23:00 → 07:00);
-   * how long has it been since the last mouse or keyboard input.
-2. If it is night and nobody has touched the machine for the "fell asleep" threshold
-   (60 minutes by default), it marks the moment.
-   * If pausing is enabled, it measures the peak audio level on the default output
-     device via WASAPI. **Only if sound is actually playing** (peak > 0.005) does it
-     send the multimedia play/pause key. The key is a toggle, so pressing it blindly
-     could start a video instead of pausing one — the sound check prevents that.
-3. After the "go to sleep after" delay (15 minutes by default) with still no input, it
-   calls `Application.SetSuspendState` with either `Hibernate` or `Suspend`.
-4. Any mouse movement or keypress before that resets the mark and is written to the log —
-   so watching a 3-hour movie with the mouse untouched is not mistaken for falling asleep
-   until you actually stop touching it.
-5. "Dry run" mode (checkbox *Только показывать, ничего не делать*) makes the fox log what
-   it *would* do and touch nothing at all.
+## Download and run
 
-## Requirements
+1. Take `SleepyFox.exe` from the [latest release](https://github.com/AppleFoxx/sleepy-fox/releases/latest).
+2. Run it — a sleeping fox appears in the tray. Right-click the icon for the menu and settings.
+3. **For the first night**, tick *Только показывать, ничего не делать* (dry run): the fox only
+   writes to its log, so you can see what it would do without risking a surprise hibernation.
+   Read **Журнал…** in the morning, then untick it.
 
-* Windows 7 SP1 or newer, 64-bit or 32-bit.
-* .NET Framework 4.8 — already present on Windows 10 (1903+) and Windows 11. On older
-  systems you may need to install it.
-* Hibernation enabled, if you pick hibernation:
-  `powercfg /hibernate on` in an elevated command prompt.
+**Requirements:** Windows 7 SP1+ (32- or 64-bit) with .NET Framework 4.8 — already present on
+Windows 10 (1903+) and Windows 11. If you choose hibernation, enable it first:
+`powercfg /hibernate on` in an elevated command prompt.
 
-## How to build
+The window text is in Russian, because this is a small home utility.
 
-### Option A — `build.cmd` (no Visual Studio needed)
+## Settings
 
-The built-in C# 5 compiler from .NET Framework 4.8 is enough:
-
-```bat
-build.cmd
-```
-
-The script compiles `src\*.cs` with
-`%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe /target:winexe /platform:anycpu /optimize+`
-and puts the result in `bin\SleepyFox.exe`. Source paths are relative, so the script can be
-double-clicked.
-
-### Option B — MSBuild
-
-```bat
-msbuild src\SleepyFox.csproj /p:Configuration=Release /p:Platform=AnyCPU
-```
-
-The exe lands in `src\bin\Release\SleepyFox.exe`. This is also what
-`.github/workflows/build.yml` does on `windows-latest`.
-
-> The sources are plain C# 5 on purpose: no string interpolation, no `?.`, no `nameof`,
-> no expression-bodied members, no auto-properties with initializers, no tuples. This is
-> what the in-box `csc.exe` accepts, and it keeps the project buildable on a machine with
-> nothing but Windows and .NET Framework installed.
-
-## First run — read this
-
-1. Build the exe and run it. A small sleeping fox appears in the tray.
-2. Right-click the icon → **Настройки…**
-3. **Turn on "Только показывать, ничего не делать" for the first night.** In that mode the
-   fox only writes to the log file, so you can see exactly what it would have done without
-   risking a surprise hibernation.
-4. Read **Журнал…** the next morning. If everything looks sane, uncheck the box and let it
-   work for real.
-
-## Configuration
-
-Right-click the tray icon → **Настройки…** (or double-click the icon). All labels are in
-Russian, since this is a small home utility. The window has:
+Right-click the tray icon → **Настройки…**. Everything lives in
+`%APPDATA%\SleepyFox\settings.ini` as plain `key=value` text.
 
 | Setting | Meaning | Default |
 |---|---|---|
-| Ночь с / до | Night window in hours (0–23) and minutes (0–59). May cross midnight: from 23:00 to 07:00. | 23:00 → 07:00 |
-| Считать заснувшим после, мин | Minutes without mouse/keyboard input before we assume you fell asleep. | 60 |
-| Уходить в сон или гибернацию через, мин | Minutes after the video is paused and no input before suspending. | 15 |
-| Гибернация / Сон | What to do: hibernate or sleep. | Hibernate |
-| Ставить видео на паузу, если идёт звук | Send the play/pause key when sound is playing. | On |
-| Только показывать, ничего не делать (режим проверки) | Dry run: log only, never press keys, never suspend. | Off |
-| Проверять каждые, мин | How often to look at the clock and the idle timer. | 5 |
-| Запускать при входе в систему | Write `SleepyFox` into `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`. | Off |
+| Ночь с / до | the night window; may cross midnight | 23:00 → 07:00 |
+| Считать заснувшим после, мин | idle minutes before the fox assumes you fell asleep | 60 |
+| Уходить в сон или гибернацию через, мин | minutes after the pause, with no input, before suspending | 15 |
+| Гибернация / Сон | hibernate or sleep | Hibernate |
+| Ставить видео на паузу, если идёт звук | send play/pause only when sound is playing | On |
+| Только показывать, ничего не делать | dry run: log only, touch nothing | Off |
+| Проверять каждые, мин | how often to look at the clock and the idle timer | 5 |
+| Запускать при входе в систему | add the fox to `HKCU\…\Run` | Off |
 
-The settings live in `%APPDATA%\SleepyFox\settings.ini` as plain `key=value` text and are
-read at startup and written when you press **Сохранить**.
-
-## Tray menu
-
-* **Настройки…** — the settings window (double-clicking the icon does the same).
-* **Проверить сейчас (о чём лиса думает)** — run one check immediately and show the result in a balloon tip.
-* **Не усыплять сегодня** / **Возобновить слежку** — temporarily stop doing anything. The flag lives in
-  memory only; it is not written to the settings file. It clears itself once the night
-  window ends.
-* **Журнал…** — the last 200 log lines, with a link to open the log file in Notepad.
-* **Проверить обновления** — the only network request the program ever makes, and only when you
-  pick this item yourself: it asks GitHub once for the number of the latest release and tells you
-  whether a newer version exists. Nothing about you is sent. If you never pick it, the program
-  never touches the network.
-* **О программе** — short help and the version.
-* **Выход** — stop and remove the tray icon.
-
-## Files it creates
-
-Everything is under `%APPDATA%\SleepyFox\`:
-
-* `settings.ini` — your settings;
-* `state.txt` — the moment the fox decided you were asleep (used to survive a restart);
-* `sleepyfox.log` — the log, trimmed to the last 500 lines once it exceeds 1 MB.
-
-Nothing else is written anywhere: no registry keys other than the optional `Run` value,
-no files in Program Files, no shortcuts, no scheduled tasks, no services.
+The log window keeps the last 200 lines; the log file is trimmed to 500 lines once it passes
+1 MB. Nothing is written outside `%APPDATA%\SleepyFox\`: no shortcuts, no scheduled tasks, no
+services, no registry keys other than the optional `Run` value.
 
 ## Honest limitations
 
-* **The audio check is a heuristic.** A quiet scene in a video looks like silence, so the
-  pause key is not sent (the machine still hibernates later, just with the video playing).
-  And *any* sound on the default output device counts — music, a notification, a call —
-  so the fox may pause something else.
-* **The play/pause key is global.** It goes to whichever app currently owns the media keys
-  (usually the last one that played something). With several players open, it can pause the
-  wrong one. There is no per-application control and no "is the video fullscreen" check.
-* **Playback is not resumed.** When you come back, the video stays paused; the fox does not
-  send the key again, because that toggle could just as easily start playback again.
-* **Hibernation may be unavailable.** If hibernation is disabled (`powercfg /hibernate off`),
-  is blocked by a policy, or another program holds a power request, `SetSuspendState`
-  returns `false`. The fox logs that honestly and retries on the next check. It cannot
-  force the machine down.
-* **Idle time is not the same as being asleep.** If you sit still for an hour at night
-  watching something with headphones on, the fox will treat it as falling asleep. Raise the
-  threshold or use the night window to narrow when it may act.
-* **One instance per session.** A second launch just shows a message. Separate Windows
-  users are not coordinated.
-* **The tray icon is the real fox icon.** The same `src\fox.ico` is embedded twice: as the
-  exe's own icon (so Explorer shows it on the file) and as an assembly resource, which the
-  program loads at run time at the size Windows expects for the tray. If that embedded
-  resource is ever missing or unreadable, the fox falls back to the simple icon drawn in code.
-* **No network access, with one exception.** The program does not go online at startup, on a
-  timer, or in the background: no telemetry, no analytics, no crash reports, no automatic
-  update checks. The single request it can make happens only when you choose **Проверить
-  обновления** in the tray menu — then it asks GitHub once for the latest release number and
-  sends nothing about you (no identifiers, no settings, no usage data). If you never pick that
-  item, the fox never touches the network.
-* **Not code-signed yet**, so SmartScreen may warn you the first time. An application for the
-  free SignPath Foundation certificate is pending — see [Code signing policy](#code-signing-policy).
-* **What is verified so far:** the project builds both on GitHub Actions (`windows-latest`)
-  and with the in-box `csc.exe` on Windows 11; the dry-run mode has been running on a live
-  Windows 11 laptop, where it correctly detected the night window and the idle time and
-  wrote both to the journal; the settings window was opened there and its settings were
-  saved through it, the tray menu was used (including "Не усыплять сегодня"), and the
-  autostart entry was created.
-* **The whole chain has run on a live Windows 11 laptop.** On the night of 2026-10-06 → 07
-  the app noticed the idle time, paused a playing video with the media key and put the
-  machine into hibernation. That first real night also exposed a bug: the app counted its
-  *own* media-key press as the user coming back, reset the sleep mark, and so never reached
-  hibernation with realistic thresholds. The fix — carry over the idle accumulated *before*
-  the press instead of the time since it — shipped in 1.0.7 and was confirmed by a live
-  short-interval run on 2026-10-07. The journal recorded every step.
-* **What is not verified yet:** only Windows 11 (25H2) has been used so far; Windows 10 is
-  supported by the code but untested. There is no macOS version.
+* **The audio check is a heuristic.** A quiet scene looks like silence, so the pause is not
+  sent (the machine still hibernates later, just with the video playing). And *any* sound on
+  the default output device counts — music, a call, a notification — so the fox may pause
+  something else.
+* **The play/pause key is global.** It goes to whichever app owns the media keys, usually the
+  last one that played something. There is no per-app control and no fullscreen check.
+* **Playback is not resumed** — on purpose: the same toggle could start the video again.
+* **Hibernation may be unavailable** (turned off, blocked by policy, or another program holds
+  a power request). The fox logs that honestly and retries on the next check; it cannot force
+  the machine down.
+* **Idle is not the same as asleep.** Sit still with headphones on for an hour at night and the
+  fox will take it for falling asleep. Raise the threshold or narrow the night window.
+* **One instance per Windows session.**
+* **No network access, with one exception.** Nothing is sent anywhere at startup, on a timer,
+  or in the background — no telemetry, no analytics, no crash reports, no automatic update
+  checks. The single request happens only when you pick **Проверить обновления** in the tray
+  menu: it asks GitHub once for the latest release number and sends nothing about you.
+* **Not code-signed yet**, so SmartScreen may warn on the first launch — see
+  [Code signing policy](#code-signing-policy).
+
+*Verified so far: builds on GitHub Actions (`windows-latest`) and with the in-box `csc.exe`; a
+whole night on a live Windows 11 laptop (07 → 08.10.2026) — the fox marked "asleep" and paused
+the video at 23:58, hibernated at 00:13, and the machine slept until morning. The first real
+night (06 → 07.10) exposed a real bug — the app took its **own** media-key press for the user
+coming back; fixed in 1.0.7. Not verified: Windows 10 (supported by the code, untested); there
+is no macOS version.*
 
 ## Code signing policy
 
@@ -189,6 +103,13 @@ When signing is in place, the policy is:
   specifically requested by the user or the person installing or operating it. See
   [PRIVACY.md](PRIVACY.md).
 
+## Build from source
+
+`build.cmd` — with the C# 5 compiler built into .NET Framework 4.8; no Visual Studio, no NuGet.
+Or `msbuild src\SleepyFox.csproj /p:Configuration=Release`. The sources are deliberately plain
+C# 5 (no string interpolation, no `?.`, no `nameof`, no tuples), which keeps the project
+buildable on a machine with nothing but Windows.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
@@ -197,112 +118,70 @@ MIT — see [LICENSE](LICENSE).
 
 # The Sleepy Fox (сонная лиса) — по-русски
 
-Маленькая программа в трее для знакомой беды: засыпаешь перед компьютером под видео,
-видео играет, Windows из-за этого не засыпает сама, и компьютер работает до утра.
+<p align="center">
+  <img src="docs/logo.png" width="90" alt="Сонная лиса">
+</p>
 
-Лиса живёт рядом с часами и ночью, если мышь и клавиатуру давно не трогали:
+Маленькая программа в трее для знакомой беды: засыпаешь перед компьютером под видео, видео
+играет, Windows из-за этого не засыпает сама, и компьютер работает до утра.
 
-1. ставит видео на паузу (только если слышит звук — клавиша play/pause работает как
-   переключатель, и слепое нажатие могло бы, наоборот, включить видео);
-2. ещё через некоторое время отправляет компьютер в **гибернацию** (или в сон — как выбрано
-   в настройках);
-3. любое движение мыши или нажатие клавиши до этого сбрасывает отсчёт.
+**Что она делает.** Ночью, если мышь и клавиатуру давно не трогали, лиса ставит видео на
+паузу, а ещё через время отправляет компьютер в гибернацию (или в сон — как выбрано). Перед
+нажатием она слушает: клавиша play/pause — переключатель, и слепое нажатие могло бы, наоборот,
+включить видео.
 
-## Что нужно
+`150 КБ` · без установщика · без служб · без прав администратора · MIT
 
-* Windows 7 SP1 или новее.
-* .NET Framework 4.8 — на Windows 10 (начиная с 1903) и Windows 11 уже стоит.
-* Гибернация, если выбран этот вариант: в командной строке от администратора
-  `powercfg /hibernate on`.
+## Скачать и запустить
 
-## Как собрать
+1. Взять `SleepyFox.exe` из [последнего релиза](https://github.com/AppleFoxx/sleepy-fox/releases/latest).
+2. Запустить — в трее появится спящая лиса. Правый щелчок по значку — меню и настройки.
+3. **На первую ночь** включить галочку «Только показывать, ничего не делать» (режим проверки):
+   лиса только записывает в журнал, что сделала бы. Утром посмотреть **Журнал…** и снять галочку.
 
-**Способ 1, самый простой — `build.cmd`.** Ни Visual Studio, ни NuGet не нужны:
-щёлкните по `build.cmd` дважды, готовый файл появится в `bin\SleepyFox.exe`.
-Скрипт берёт встроенный компилятор
-`%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe`.
-
-**Способ 2 — MSBuild:**
-`msbuild src\SleepyFox.csproj /p:Configuration=Release /p:Platform=AnyCPU`,
-готовый файл — `src\bin\Release\SleepyFox.exe`.
-
-## Первый запуск — важный совет
-
-На первую ночь **включите галочку «Только показывать, ничего не делать»**
-(Настройки → Безопасность). В этом режиме лиса ничего не нажимает и никуда не уходит,
-а только записывает в журнал, что сделала бы. Утром посмотрите **Журнал…** — если всё
-разумно, галочку снимите.
+**Что нужно:** Windows 7 SP1 и новее (32 или 64 бита), .NET Framework 4.8 — на Windows 10
+(с 1903) и Windows 11 уже стоит. Если выбран этот вариант, нужна включённая гибернация:
+`powercfg /hibernate on` в командной строке от администратора.
 
 ## Настройки
 
-Правый щелчок по значку в трее → **Настройки…** (или двойной щелчок по значку).
-Настройки лежат в `%APPDATA%\SleepyFox\settings.ini` простым текстом.
+Правый щелчок по значку → **Настройки…** (окно — на скриншоте выше). Всё лежит в
+`%APPDATA%\SleepyFox\settings.ini` простым текстом.
 
-* «ночь с» и «до» — часы 0–23 и минуты 0–59, окно может переходить через полночь (с 23:00 до 07:00);
-* «считать заснувшим после» — минут без мыши и клавиатуры (по умолчанию 60);
-* «уходить в сон или гибернацию через» — минут после паузы (по умолчанию 15);
-* «Гибернация» или «Сон» (по умолчанию гибернация);
-* «Ставить видео на паузу, если идёт звук» (включено);
-* «Только показывать, ничего не делать (режим проверки)» (выключено; на первый запуск лучше включить);
-* «Проверять каждые» — минут (по умолчанию 5);
-* «Запускать при входе в систему» — пишет или удаляет значение `SleepyFox` в
-  `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`.
+* **ночь с / до** — 23:00–07:00, окно может переходить через полночь;
+* **считать заснувшим после** — 60 мин без мыши и клавиатуры;
+* **уходить в сон или гибернацию через** — 15 мин после паузы;
+* **гибернация или сон**, **пауза видео только если идёт звук**, **режим проверки**,
+  **проверять каждые 5 мин**, **автозапуск**.
 
-## Меню в трее
-
-«Настройки...», «Проверить сейчас (о чём лиса думает)», «Не усыплять сегодня» /
-«Возобновить слежку», «Журнал...», «Проверить обновления», «О программе», «Выход».
-«Не усыплять сегодня» живёт только в памяти, в файл настроек не
-сохраняется и снимается сама, когда ночное окно заканчивается.
-
-«Проверить обновления» — это единственное обращение в сеть, и только по вашему нажатию:
-лиса один раз спрашивает у GitHub номер последней версии и говорит, вышла ли новая.
-Никаких данных о вас она при этом не отправляет. Не нажимать — значит вообще не ходить в сеть.
+Журнал хранит последние 200 строк, файл журнала обрезается до 500 строк после 1 МБ. Больше
+нигде ничего не пишется: ни ярлыков, ни задач планировщика, ни служб, ни ключей реестра, кроме
+необязательного `Run`.
 
 ## Честные ограничения
 
-* Проверка звука — это догадка, а не знание: тихая сцена в видео выглядит как тишина,
-  и пауза не нажмётся (компьютер всё равно уснёт позже, просто с играющим видео). И любой
-  звук на устройстве вывода считается «видео играет» — музыка, уведомление, звонок.
-* Клавиша play/pause общая для всей системы: нажатие уходит в то приложение, которое
-  сейчас владеет медиаклавишами. Если открыто несколько плееров, пауза может достаться
-  не тому. Управления «по приложению» и проверки полноэкранного режима нет.
-* Обратно видео не включается: когда вы вернулись, оно остаётся на паузе — лиса не жмёт
-  клавишу второй раз, чтобы случайно не запустить воспроизведение.
-* Гибернация может быть недоступна (выключена, запрещена политикой, другое приложение
-  держит запрос на питание). Тогда лиса честно пишет в журнал, что уложить компьютер не
-  вышло, и пробует на следующей проверке. Заставить систему уснуть она не может.
-* Бездействие — не то же самое, что сон: если вы час сидите неподвижно под ночным видео,
-  лиса решит, что вы уснули. Поднимите порог или сузьте ночное окно.
-* Один экземпляр на сеанс Windows; разные пользователи между собой не согласуются.
-* **Значок трея — настоящая иконка лисы.** Та же `src\fox.ico` встроена в программу
-  дважды: как значок самого файла (его видно в Проводнике) и как ресурс сборки, откуда
-  приложение берёт её в размере, который Windows ждёт для трея. Если этот ресурс вдруг
-  пропадёт или не прочитается, лиса вернётся к простому значку, нарисованному кодом.
-* **В сеть программа не ходит — кроме одного случая.** Ни при запуске, ни по таймеру, ни в
-  фоне: ни телеметрии, ни аналитики, ни отчётов об ошибках, ни автоматической проверки
-  обновлений. Единственный запрос возможен только тогда, когда вы сами выберете в меню
-  трея «Проверить обновления»: тогда лиса один раз спрашивает у GitHub номер последней
-  версии и больше ничего никуда не отправляет — ни данных о вас, ни настроек, ни сведений
-  об использовании. Не нажимать этот пункт — значит вообще не выходить в сеть.
-* Подписи кода пока нет, поэтому SmartScreen при первом запуске может предупредить.
-  Заявка на бесплатный сертификат фонда SignPath подана и ждёт рассмотрения — подробности
-  в разделе «Политика подписи кода» ниже.
-* **Что уже проверено:** проект собирается и в облаке GitHub (windows-latest), и
-  встроенным компилятором на Windows 11; режим проверки работал на живом ноутбуке с
-  Windows 11 и правильно определял ночное окно и время бездействия, записывая это в
-  журнал; окно настроек на этой же машине открывали и сохраняли через него настройки,
-  меню в трее использовали (в том числе «Не усыплять сегодня»), запись автозапуска
-  создана.
-* **Весь цикл отработал на живом ноутбуке с Windows 11.** В ночь с 06 на 07.10.2026
-  приложение увидело бездействие, поставило играющее видео на паузу медиаклавишей и
-  уложило компьютер в гибернацию. Тот же первый настоящий запуск вскрыл ошибку:
-  приложение засчитывало **своё же** нажатие медиаклавиши за возвращение человека,
-  сбрасывало отметку сна и с реальными порогами до гибернации не доходило. Исправление —
-  переносить бездействие, накопленное **до** нажатия, а не время с момента, — вышло в 1.0.7
-  и подтверждено живым коротким прогоном 07.10.2026. Каждый шаг записан в журнал.
-* **Что ещё не проверено:** использовалась только Windows 11 (25H2); Windows 10 код
-  поддерживает, но на ней не проверялось. Версии под macOS нет.
+* **Проверка звука — догадка, а не знание.** Тихая сцена в видео выглядит как тишина, и пауза
+  не нажмётся (компьютер всё равно уснёт позже, просто с играющим видео). И любой звук на
+  устройстве вывода считается «видео играет» — музыка, уведомление, звонок.
+* **Клавиша play/pause общая для всей системы:** нажатие уходит в то приложение, которое сейчас
+  владеет медиаклавишами. Управления «по приложению» и проверки полного экрана нет.
+* **Обратно видео не включается** — намеренно: та же клавиша могла бы запустить его снова.
+* **Гибернация может быть недоступна** (выключена, запрещена политикой, другое приложение держит
+  запрос на питание). Лиса честно пишет это в журнал и пробует снова; заставить систему уснуть
+  она не может.
+* **Бездействие — не то же самое, что сон:** если час сидеть неподвижно под ночным видео, лиса
+  решит, что вы уснули. Поднимите порог или сузьте ночное окно.
+* **Один экземпляр на сеанс Windows.**
+* **В сеть программа не ходит** — кроме одного случая: пункт **«Проверить обновления»** в меню
+  трея один раз спрашивает у GitHub номер последней версии и ничего о вас не отправляет. Не
+  нажимать — значит вообще не выходить в сеть.
+* **Подписи кода пока нет** — SmartScreen может предупредить при первом запуске. См. ниже.
+
+*Что проверено: сборка в GitHub Actions (`windows-latest`) и встроенным `csc.exe`; целая ночь на
+живом ноутбуке с Windows 11 (07 → 08.10.2026) — отметка и пауза в 23:58, гибернация в 00:13,
+машина проспала до утра. Первая настоящая ночь (06 → 07.10) вскрыла ошибку — приложение
+засчитывало **своё же** нажатие медиаклавиши за возвращение человека; исправлено в 1.0.7. Не
+проверено: Windows 10 (код поддерживает, тестов не было); версии под macOS нет.*
 
 ## Политика подписи кода
 
@@ -319,6 +198,13 @@ MIT — see [LICENSE](LICENSE).
   Утверждающие: [Катя (AppleFoxx)](https://github.com/AppleFoxx) — каждый релиз утверждается вручную.
 * **Приватность.** Программа не передаёт никаких данных другим сетевым системам, если этого явно
   не запросил пользователь или тот, кто её устанавливает. Подробности — [PRIVACY.md](PRIVACY.md).
+
+## Сборка из исходников
+
+`build.cmd` — встроенным компилятором C# 5 из .NET Framework 4.8; ни Visual Studio, ни NuGet не
+нужны. Или `msbuild src\SleepyFox.csproj /p:Configuration=Release`. Исходники намеренно на
+«простом» C# 5 (без интерполяции строк, `?.`, `nameof`, кортежей), чтобы проект собирался на
+машине, где есть только Windows.
 
 ## Лицензия
 
